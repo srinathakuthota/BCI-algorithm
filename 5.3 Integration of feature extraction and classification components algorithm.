@@ -1,0 +1,45 @@
+5.3 Integration of feature extraction and classification components algorithm.
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import tensorflow as tf
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+# Generate synthetic data
+n_samples = 1000
+n_features = 20
+n_classes = 3
+X = np.random.rand(n_samples, n_features)
+y = np.random.randint(0, n_classes, size=n_samples)
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Data preprocessing
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+# Define feature extraction and classification model
+model = Sequential ([
+Dense (64, activation='relu', input_shape=(n_features,)),
+Dropout (0.5),
+Dense (32, activation='relu'),
+Dropout (0.5),
+Dense (n_classes, activation='softmax')
+])
+# Compile the model
+model.compile(optimizer='adam',
+loss='sparse_categorical_crossentropy',
+metrics=['accuracy'])
+# Train the model
+model.fit(X_train_scaled, y_train, epochs=20, batch_size=32, validation_split=0.2)
+# Evaluate the model
+test_loss, test_accuracy = model.evaluate(X_test_scaled, y_test)
+print ("Test Accuracy:", test_accuracy)
+# Make predictions
+y_pred_probs = model.predict(X_test_scaled)
+y_pred = np.argmax(y_pred_probs, axis=1)
+# Generate classification report and confusion matrix
+print ("Classification Report:")
+print (classification report (y_test, y_pred))
+print ("Confusion Matrix:")
+print (confusion matrix (y_test, y_pred))
