@@ -1,0 +1,55 @@
+5.2 Related code snippets and programming details.
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import tensorflow as tf
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+# Generate EEG data for MI classification
+n_samples = 10000
+n_channels = 16
+n_time_samples = 500
+n_classes = 4
+X = np.random.rand(n_samples, n_channels, n_time_samples)
+y = np.random.randint(0, n_classes, size=n_samples)
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Data preprocessing
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train.reshape(-1, n_channels * n_time_samples))
+X_test_scaled = scaler.transform(X_test.reshape(-1, n_channels * n_time_samples))
+# Define the neural network architecture
+model = Sequential ([
+Dense (64, activation='relu', input_shape= (n_channels * n_time_samples,)),
+Dropout (0.5),
+Dense (32, activation='relu'),
+Dropout (0.5),
+Dense (n_classes, activation='softmax')
+])
+# Compile the model
+model.compile(optimizer='adam',
+loss='sparse_categorical_crossentropy',
+metrics=['accuracy'])
+# Train the model
+history = model.fit(X_train_scaled, y_train, epochs=20, batch_size=32, validation_split=0.2, verbose=0)
+# Evaluate the model on the test data
+test_loss, test_accuracy = model.evaluate(X_test_scaled, y_test)
+print ("Test Accuracy:", test_accuracy)
+# Make predictions on test data
+y_pred_probs = model.predict(X_test_scaled)
+y_pred = np.argmax(y_pred_probs, axis=1)
+# Generate classification report
+print ("Classification Report:")
+print (classification_report(y_test, y_pred))
+# Generate confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+# Plot confusion matrix
+plt.figure(figsize= (8, 6))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False)
+plt.xlabel('Predicted Labels')
+plt.ylabel('True Labels')
+plt.title('Confusion Matrix')
+plt.show()
